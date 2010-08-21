@@ -25,6 +25,13 @@ gem 'mysql'
 # Bundle gems for the local environment. Make sure to
 # put test-only gems in this group so their generators
 # and rake tasks are available in development mode:
-# group :development, :test do
-#   gem 'webrat'
-# end
+
+gem 'juggernaut'
+
+group :development, :test do
+  gem 'rspec', :require => false
+  gem 'rspec-rails', :require => false
+  gem 'ZenTest', :require => false
+  gem 'rcov', :require => false
+  gem 'test-unit', '1.2.3'
+end
