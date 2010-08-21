@@ -28,6 +28,13 @@ Rails::Initializer.run do |config|
 
   config.gem "juggernaut"
   
+  if %w(development test).include?(RAILS_ENV)
+    config.gem 'rspec', :lib => false
+    config.gem 'rspec-rails', :lib => false
+    config.gem 'ZenTest', :lib => false
+    config.gem 'rcov', :lib => false
+  end
+  
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
   # :all can be used as a placeholder for all plugins not explicitly named
