@@ -1,6 +1,7 @@
 Capfile
 
 config/deploy.rb
+config/database.yml
 config/*.yml
 !config/*.example.yml
 
