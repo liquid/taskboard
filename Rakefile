@@ -4,4 +4,4 @@
 require File.expand_path('../config/application', __FILE__)
 require 'rake'
 
-Taskboard::Application.load_tasks
+Taskboardapp::Application.load_tasks
