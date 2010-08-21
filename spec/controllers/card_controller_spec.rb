@@ -206,7 +206,7 @@ describe CardController do
 
       post 'load_burndown', { :id => '34'}, {:user_id => 1, :editor => true}
       response.should be_success
-      response.body.should include_text("1223762400000")
+      response.body.should include_text("1223769600")
     end
   
   end

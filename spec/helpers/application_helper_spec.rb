@@ -22,9 +22,9 @@ include ApplicationHelper
 describe ApplicationHelper do
 
   it "should make time" do
-    make_time("2008-10-12").should eql(1223762400)
-    make_time("2006-04-29").should eql(1146261600)
-    make_time("2014-07-04").should eql(1404424800)
+    make_time("2008-10-12").should eql(1223769600)
+    make_time("2006-04-29").should eql(1146268800)
+    make_time("2014-07-04").should eql(1404432000)
   end
 
   it "should build proper javascript data structure from empty burndown hash" do

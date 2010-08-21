@@ -123,7 +123,7 @@ describe TaskboardController, "while showing single taskboard page" do
 
     post_as_editor 'load_burndown', :id => '1'
     response.should be_success
-    response.body.should include "1223762400000"
+    response.body.should include "1223769600"
   end
 
   context "while dealing with taskboard name" do

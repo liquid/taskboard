@@ -29,7 +29,7 @@ module ApplicationHelper
 
   def make_time(time_in_string)
     time = time_in_string.split("-")
-    Time.mktime(time[0], time[1], time[2], 0, 0, 0, 0).to_i
+    Time.utc(time[0], time[1], time[2], 0, 0, 0, 0).to_i
   end
   
 end
