@@ -33,6 +33,7 @@ Rails::Initializer.run do |config|
     config.gem 'rspec-rails', :lib => false
     config.gem 'ZenTest', :lib => false
     config.gem 'rcov', :lib => false
+    config.gem 'test-unit', :version => '1.2.3'
   end
   
   # Only load the plugins named here, in the order given. By default, all plugins 
