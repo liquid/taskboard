@@ -28,7 +28,7 @@ end
 
 describe TaskboardController, "while creating new taskboard" do
 
-  integrate_views
+  render_views
   fixtures :projects, :taskboards, :columns, :cards
 
   it "should only allow adding new taskboards to existing project" do
@@ -78,7 +78,7 @@ end
 
 describe TaskboardController, "while showing single taskboard page" do
 
-  integrate_views
+  render_views
   fixtures :taskboards, :columns, :rows, :cards
 
   before(:each) do
@@ -310,7 +310,7 @@ end
 
 describe TaskboardController, "while adding new card" do
 
-  integrate_views
+  render_views
   fixtures :taskboards, :columns, :rows, :cards
   
   before(:each) do

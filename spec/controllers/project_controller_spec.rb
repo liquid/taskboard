@@ -19,7 +19,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProjectController, "while showing projects list page" do
 
-  integrate_views
+  render_views
 
   before(:each) do
     @projects = [Project.new(:name => "Dummy test project")]

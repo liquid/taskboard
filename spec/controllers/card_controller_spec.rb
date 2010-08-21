@@ -18,7 +18,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe CardController do
-  integrate_views
+  render_views
 
   context "while dealing with name" do
   
