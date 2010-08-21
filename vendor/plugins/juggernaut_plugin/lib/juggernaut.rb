@@ -2,7 +2,7 @@ require "yaml"
 require "socket"
 
 module Juggernaut
-  CONFIG = YAML::load(ERB.new(IO.read("#{RAILS_ROOT}/config/juggernaut_hosts.yml")).result).freeze
+  CONFIG = YAML::load(ERB.new(IO.read("#{Rails.root}/config/juggernaut_hosts.yml")).result).freeze
   CR = "\0"
   
   class << self
