@@ -8,6 +8,7 @@ config/*.yml
 .bundle
 db/*.sqlite3
 log/*.log
+log/**/*.log
 tmp/**/*
 
 coverage/
@@ -25,5 +26,3 @@ spec/spec.opts
 test/
 tmp/
 taskboard_internal/
-
-log/report/*.log
