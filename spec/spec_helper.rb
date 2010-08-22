@@ -77,7 +77,7 @@ module BeforeAndAfter
   end
 end
 
-Time.send :include , BeforeAndAfter
+Time.send :include, BeforeAndAfter
 
 module Spec
   module Mocks

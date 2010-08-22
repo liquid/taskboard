@@ -17,77 +17,109 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe ProjectController, "while showing projects list page" do
+describe ProjectController do
+  
+  # TODO: Move these methods back into a separate module and extend the
+  # relevant RSpec class instead of duplicating these across different specs.
 
-  render_views
+  EDITOR = User.new(:username => 'editor', :editor => true)
+  VIEWER = User.new(:username => 'viewer', :editor => false)
 
-  before(:each) do
-    @projects = [Project.new(:name => "Dummy test project")]
+  def get_as_editor(action, params = {})
+    get_as_user action, params, EDITOR
   end
 
-  it "should map index page to 'home' url" do
-    route_for(:controller => "project", :action => "index").should == "/home"
+  def post_as_editor(action, params = {})
+    post_as_user action, params, EDITOR
   end
 
-  it "should show list of projects for editor" do
-    Project.should_receive(:find).with(:all, :order => "name").and_return(@projects)
-    get_as_editor 'index'
-    response.should be_success
-    response.should have_tag("form[action=?]", "/taskboard/add_taskboard")
-    response.should have_tag("form[action=?]", "/project/add")
+  def get_as_viewer(action, params = {})
+    get_as_user action, params, VIEWER
   end
 
-  it "should show list of taskboards for viewer" do
-    Project.should_receive(:find).with(:all, :order => "name").and_return(@projects)
-    get_as_viewer 'index'
-    response.should be_success
-    response.should_not have_tag("form[action=?]", "/taskboard/add_taskboard")
-    response.should_not have_tag("form[action=?]", "/project/add")
+  def post_as_viewer(action, params = {})
+    post_as_user action, params, VIEWER
   end
 
-end
-
-describe ProjectController, "while adding a project" do
-
-  it "should allow adding new taskboards" do
-    project = Project.new
-    Project.should_receive(:new).and_return(project)
-    project.should_receive(:save!)
-    post_as_editor 'add', :name => 'Testing new project!'
-    response.should redirect_to :action => 'index'
-    project.name.should eql 'Testing new project!'
-    project.should have(0).taskboards
+  def get_as_user(action, params, user)
+    get action, params, {:user_id => 1, :editor => user.editor, :user => user}
   end
 
-  it "should add project with default name if name not given" do
-    project = Project.new
-    Project.should_receive(:new).and_return(project)
-    post_as_editor 'add'
-    project.name.should eql Project::DEFAULT_NAME
+  def post_as_user(action, params, user)
+    post action, params, {:user_id => 1, :editor => user.editor, :user => user}
+  end
+  
+  context "while showing projects list page" do
+    render_views
+
+    before(:each) do
+      @projects = [Project.new(:name => "Dummy test project")]
+    end
+
+    it "should map index page to 'home' url" do
+      route_for(:controller => "project", :action => "index").should == "/home"
+    end
+
+    it "should show list of projects for editor" do
+      Project.should_receive(:find).with(:all, :order => "name").and_return(@projects)
+      get_as_editor 'index'
+      response.should be_success
+      response.should have_tag("form[action=?]", "/taskboard/add_taskboard")
+      response.should have_tag("form[action=?]", "/project/add")
+    end
+
+    it "should show list of taskboards for viewer" do
+      Project.should_receive(:find).with(:all, :order => "name").and_return(@projects)
+      get_as_viewer 'index'
+      response.should be_success
+      response.should_not have_tag("form[action=?]", "/taskboard/add_taskboard")
+      response.should_not have_tag("form[action=?]", "/project/add")
+    end
+  end
+  
+  context "while adding a project" do
+
+    it "should allow adding new taskboards" do
+      project = Project.new
+      Project.should_receive(:new).and_return(project)
+      project.should_receive(:save!)
+      post_as_editor 'add', :name => 'Testing new project!'
+      response.should redirect_to :action => 'index'
+      project.name.should eql 'Testing new project!'
+      project.should have(0).taskboards
+    end
+
+    it "should add project with default name if name not given" do
+      project = Project.new
+      Project.should_receive(:new).and_return(project)
+      post_as_editor 'add'
+      project.name.should eql Project::DEFAULT_NAME
+    end
+
   end
 
-end
+  context "while renaming project" do
+    
+    it "should allow changing name of a project" do
+      project = Project.new(:name => "old name")
+      Project.should_receive(:find).with(3).and_return(project)
+      project.should_receive(:save!)
+      post_as_editor 'rename', :id => 3, :name => 'new name'
+      response.should be_success
+      response.body.decode_json["status"].should eql 'success'
+      project.name.should eql 'new name'
+    end
 
-describe ProjectController, "while renaming project" do
+    it "should not allow blank project name" do
+      project = Project.new(:name => "old name")
+      Project.should_receive(:find).with(3).and_return(project)
+      project.should_not_receive(:save!)
+      post_as_editor 'rename', :id => 3, :name => '    '
+      response.should be_success
+      response.body.decode_json["status"].should eql 'error'
+      project.name.should eql 'old name'
+    end
 
-  it "should allow changing name of a project" do
-    project = Project.new(:name => "old name")
-    Project.should_receive(:find).with(3).and_return(project)
-    project.should_receive(:save!)
-    post_as_editor 'rename', :id => 3, :name => 'new name'
-    response.should be_success
-    response.body.decode_json["status"].should eql 'success'
-    project.name.should eql 'new name'
-  end
-
-  it "should not allow blank project name" do
-    project = Project.new(:name => "old name")
-    Project.should_receive(:find).with(3).and_return(project)
-    project.should_not_receive(:save!)
-    post_as_editor 'rename', :id => 3, :name => '    '
-    response.should be_success
-    response.body.decode_json["status"].should eql 'error'
-    project.name.should eql 'old name'
   end
 
 end
