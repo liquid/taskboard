@@ -23,6 +23,8 @@ class Card < ActiveRecord::Base
   belongs_to :column
   belongs_to :row
   
+  validates_format_of :color, :with => /^#([abcdefABCDEF]|\d){6}$/, :message => 'Color is not valid!'
+  
   DEFAULT_COLOR = '#F8E065'.freeze
 
   # card's list scope is within a single cell
@@ -35,10 +37,6 @@ class Card < ActiveRecord::Base
     Card.new(:name => name, :url => url, :issue_no => issue_no, :notes => notes, :position => position,
       :color => color, :tag_list => tag_list,
       :taskboard_id => taskboard_id, :column_id => column_id, :row_id => row_id)
-  end
-
-  def validate
-    errors.add('Color is not valid!') if not color.match(/^#([abcdefABCDEF]|\d){6}$/)
   end
 
   def self.add_new taskboard_id, column_id, row_id, name = 'Empty!', issue_no = nil, url = nil

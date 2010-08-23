@@ -18,14 +18,11 @@
 class User < ActiveRecord::Base
   validates_presence_of :username
   validates_uniqueness_of :username
+  validates_presence_of :hashed_password, :message => 'No password'
   
   attr_accessor :password_confirmation
   validates_confirmation_of :password
   
-  def validate
-    errors.add_to_base("No password") if hashed_password.blank?
-  end
-
   def password=(pwd)
     @password = pwd
     create_new_salt
