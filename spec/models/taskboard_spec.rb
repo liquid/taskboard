@@ -164,8 +164,8 @@ describe Taskboard, "while serializing to json" do
 
     card = cards(:scrum_story_user_card)
 
-    taskboard.to_json.should include_text('"name":"' + taskboard.name + '"')
-    taskboard.to_json.should include_text('"url":"' + card.url + '"')
+    taskboard.to_json.should contain('"name":"' + taskboard.name + '"')
+    taskboard.to_json.should contain('"url":"' + card.url + '"')
   end
 
   it "should include cards with tag list" do

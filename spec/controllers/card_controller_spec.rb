@@ -31,8 +31,8 @@ describe CardController do
       post 'update_name', { :id => '34', :name => 'new name'}, {:user_id => 1, :editor => true}
       
       response.should be_success
-      response.body.should include_text("status: 'success'")
-      card.name.should eql('new name')
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
+      card.name.should == 'new name'
     end
   
   end
@@ -48,8 +48,8 @@ describe CardController do
       post 'update_notes', { :id => '77', :notes => '*this* is markdown message' }, {:user_id => 1, :editor => true}
     
       response.should be_success
-      response.body.should include_text("status: 'success'")
-      card.notes.should eql('*this* is markdown message')
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
+      card.notes.should == '*this* is markdown message'
     end
   
   end
@@ -63,7 +63,7 @@ describe CardController do
       controller.should_receive(:sync_change_card_color).with(card).and_return("{ status: 'success' }")
       post 'change_color', { :id => 12, :color => '#fc0fc0' }, {:user_id => 1, :editor => true}
       response.should be_success
-      response.body.should include_text("status: 'success'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
     end
     
     it "should allow changing color and send appropriate error in case of fail" do
@@ -72,7 +72,7 @@ describe CardController do
       card.should_receive(:change_color).with('#fc0fc0').and_return(false)
       post 'change_color', { :id => 12, :color => '#fc0fc0' }, {:user_id => 1, :editor => true}
       response.should be_success
-      response.body.should include_text("status: 'error'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
     end
     
   end
@@ -91,8 +91,8 @@ describe CardController do
       post 'add_tag', { :id => '3', :tags => 'ala' }, {:user_id => 1, :editor => true}
 
       response.should be_success
-      response.body.should include_text("status: 'success'")
-      card.tag_list.size.should eql(2)
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
+      card.tag_list.size.should == 2
     end
     
     it "should allow adding multiple tags at once to cards" do 
@@ -106,8 +106,8 @@ describe CardController do
       post 'add_tag', { :id => '3', :tags => 'ala, ma,kota' }, {:user_id => 1, :editor => true}
 
       response.should be_success
-      response.body.should include_text("status: 'success'")
-      card.tag_list.size.should eql(4)
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
+      card.tag_list.size.should == 4
     end
     
     it "should allow removing tag from card" do
@@ -120,9 +120,9 @@ describe CardController do
       post 'remove_tag', { :id => '5', :tag => 'ma' }, {:user_id => 1, :editor => true}
       
       response.should be_success
-      response.body.should include_text("status: 'success'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       
-      card.tag_list.size.should eql(2)
+      card.tag_list.size.should == 2
 
       card.tag_list.should_not include('ma')
       card.tag_list.should include('kota')
@@ -143,7 +143,7 @@ describe CardController do
       post 'update_hours', { :id => '51', :hours_left => '12' }, {:user_id => 1, :editor => true}
 
       response.should be_success
-      response.body.should include_text("status: 'success'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
     end
 
     it "should allow changes in hours left for 'today'" do
@@ -156,7 +156,7 @@ describe CardController do
       post 'update_hours', { :id => '51', :hours_left => '12', :updated_at => 'today' }, {:user_id => 1, :editor => true}
 
       response.should be_success
-      response.body.should include_text("status: 'success'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
     end
 
     it "should allow changes in hours left for 'tomorrow'" do
@@ -169,7 +169,7 @@ describe CardController do
       post 'update_hours', { :id => '51', :hours_left => '12', :updated_at => 'tomorrow' }, {:user_id => 1, :editor => true}
 
       response.should be_success
-      response.body.should include_text("status: 'success'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
     end
 
     it "should allow changes in hours left for 'yesterday'" do
@@ -181,17 +181,17 @@ describe CardController do
       post 'update_hours', { :id => '51', :hours_left => '12', :updated_at => 'yesterday' }, {:user_id => 1, :editor => true}
 
       response.should be_success
-      response.body.should include_text("status: 'success'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
     end
     
     it "should validate hours on save" do
       post 'update_hours', { :id => '13', :hours_left => 'miau' }, {:user_id => 1, :editor => true}
       response.should be_success
-      response.body.should include_text("status: 'error'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
 
       post 'update_hours', { :id => '13', :hours_left => '-2' }
       response.should be_success
-      response.body.should include_text("status: 'error'")
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
     end
   
   end
@@ -206,7 +206,7 @@ describe CardController do
 
       post 'load_burndown', { :id => '34'}, {:user_id => 1, :editor => true}
       response.should be_success
-      response.body.should include_text("1223769600")
+      response.body.should contain("1223769600")
     end
   
   end

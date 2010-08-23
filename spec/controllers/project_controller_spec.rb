@@ -19,36 +19,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe ProjectController do
   
-  # TODO: Move these methods back into a separate module and extend the
-  # relevant RSpec class instead of duplicating these across different specs.
-
-  EDITOR = User.new(:username => 'editor', :editor => true)
-  VIEWER = User.new(:username => 'viewer', :editor => false)
-
-  def get_as_editor(action, params = {})
-    get_as_user action, params, EDITOR
-  end
-
-  def post_as_editor(action, params = {})
-    post_as_user action, params, EDITOR
-  end
-
-  def get_as_viewer(action, params = {})
-    get_as_user action, params, VIEWER
-  end
-
-  def post_as_viewer(action, params = {})
-    post_as_user action, params, VIEWER
-  end
-
-  def get_as_user(action, params, user)
-    get action, params, {:user_id => 1, :editor => user.editor, :user => user}
-  end
-
-  def post_as_user(action, params, user)
-    post action, params, {:user_id => 1, :editor => user.editor, :user => user}
-  end
-  
   context "while showing projects list page" do
     render_views
 
@@ -106,7 +76,7 @@ describe ProjectController do
       project.should_receive(:save!)
       post_as_editor 'rename', :id => 3, :name => 'new name'
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       project.name.should eql 'new name'
     end
 
@@ -116,7 +86,7 @@ describe ProjectController do
       project.should_not_receive(:save!)
       post_as_editor 'rename', :id => 3, :name => '    '
       response.should be_success
-      response.body.decode_json["status"].should eql 'error'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
       project.name.should eql 'old name'
     end
 

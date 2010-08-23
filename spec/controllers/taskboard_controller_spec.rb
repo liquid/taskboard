@@ -20,36 +20,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe TaskboardController do
   
-  # TODO: Move these methods back into a separate module and extend the
-  # relevant RSpec class instead of duplicating these across different specs.
-
-  EDITOR = User.new(:username => 'editor', :editor => true)
-  VIEWER = User.new(:username => 'viewer', :editor => false)
-
-  def get_as_editor(action, params = {})
-    get_as_user action, params, EDITOR
-  end
-
-  def post_as_editor(action, params = {})
-    post_as_user action, params, EDITOR
-  end
-
-  def get_as_viewer(action, params = {})
-    get_as_user action, params, VIEWER
-  end
-
-  def post_as_viewer(action, params = {})
-    post_as_user action, params, VIEWER
-  end
-
-  def get_as_user(action, params, user)
-    get action, params, {:user_id => 1, :editor => user.editor, :user => user}
-  end
-
-  def post_as_user(action, params, user)
-    post action, params, {:user_id => 1, :editor => user.editor, :user => user}
-  end
-  
   context "while showing taskboards list page" do
     it "should redirect to projects' list page" do
       get_as_editor 'index'
@@ -142,7 +112,7 @@ describe TaskboardController do
       Taskboard.should_receive(:find).with(1).and_return(taskboard)
       post_as_editor 'get_taskboard', :id => 1
       response.should be_success
-      response.body.decode_json["taskboard"]["name"].should eql "this is a taskboard"
+      ActiveSupport::JSON.decode(response.body)[:taskboard][:name].should == 'this is a taskboard'
     end
 
     it "should return burndown data" do
@@ -166,7 +136,7 @@ describe TaskboardController do
         controller.should_receive(:sync_rename_taskboard).with(taskboard, hash_including(:before => "old name")).and_return("{ status: 'success' }")
         post_as_editor 'rename_taskboard', :id => 3, :name => 'new name'
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
         taskboard.name.should eql 'new name'
       end
 
@@ -175,7 +145,7 @@ describe TaskboardController do
         Taskboard.should_receive(:find).with(3).and_return(taskboard)
         post_as_editor 'rename_taskboard', :id => 3, :name => ''
         response.should be_success
-        response.body.decode_json["status"].should eql 'error'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
         taskboard.name.should eql 'old'
       end
 
@@ -184,7 +154,7 @@ describe TaskboardController do
         Taskboard.should_receive(:find).with(3).and_return(taskboard)
         post_as_editor 'rename_taskboard', :id => 3, :name => '     '
         response.should be_success
-        response.body.decode_json["status"].should eql 'error'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
         taskboard.name.should eql 'old'
       end
 
@@ -200,7 +170,7 @@ describe TaskboardController do
         controller.should_receive(:sync_add_column).with(new_column).and_return("{ status: 'success' }")
         post_as_editor 'add_column', :name => new_column.name, :taskboard_id => new_column.taskboard_id
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
     
       it "should allow removing column" do
@@ -211,7 +181,7 @@ describe TaskboardController do
         controller.should_receive(:sync_delete_column).with(column).and_return("{ status: 'success' }")
         post_as_editor 'remove_column', :id => '56'
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
 
       it "should allow clean column" do
@@ -220,7 +190,7 @@ describe TaskboardController do
         controller.should_receive(:sync_clean_column).with(column).and_return("{ status: 'success' }")
         post_as_editor 'clean_column', :id => column.id
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
         Column.find(column_id).cards.should eql []
       end
 
@@ -231,7 +201,7 @@ describe TaskboardController do
         controller.should_receive(:sync_move_column).with(column, hash_including(:before => 6)).and_return("{ status: 'success' }")
         post_as_editor 'reorder_columns', :id => 13, :position => 3
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
     
       it "should allow column renaming" do
@@ -241,7 +211,7 @@ describe TaskboardController do
         controller.should_receive(:sync_rename_column).with(column, hash_including(:before => 'Column')).and_return("{ status: 'success' }")
         post_as_editor 'rename_column', :id => 42, :name => 'New name'
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
         column.name.should eql 'New name'
       end
 
@@ -250,7 +220,7 @@ describe TaskboardController do
         Column.should_receive(:find).with(42).and_return(column)
         post_as_editor 'rename_column', :id => 42, :name => ''
         response.should be_success
-        response.body.decode_json["status"].should eql 'error'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
         column.name.should eql 'Column'
       end
 
@@ -268,7 +238,7 @@ describe TaskboardController do
         controller.should_receive(:sync_add_row).with(new_row).and_return("{ status: 'success' }")
         post_as_editor 'add_row', :name => new_row.name, :taskboard_id => taskboard.id
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
 
       it "should allow removing row" do
@@ -279,7 +249,7 @@ describe TaskboardController do
         controller.should_receive(:sync_delete_row).with(row).and_return("{ status: 'success' }")
         post_as_editor 'remove_row', :id => '34'
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
 
       it "should allow clean row" do
@@ -288,7 +258,7 @@ describe TaskboardController do
         controller.should_receive(:sync_clean_row).with(row).and_return("{ status: 'success' }")
         post_as_editor 'clean_row', :id => row.id
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
         Row.find(row_id).cards.should eql []
       end
 
@@ -304,7 +274,7 @@ describe TaskboardController do
         controller.should_receive(:sync_delete_card).with(card).and_return("{ status: 'success' }")
         post_as_editor 'remove_card', :id => '34'
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
     
       it "should allow cards reordering" do
@@ -315,7 +285,7 @@ describe TaskboardController do
         controller.should_receive(:sync_move_card).with(card, hash_including(:before)).and_return("{ status: 'success' }")
         post_as_editor 'reorder_cards', :id => 13, :column_id => 3, :row_id => 4, :position => 5
         response.should be_success
-        response.body.decode_json["status"].should eql 'success'
+        ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
       end
   
     end
@@ -361,7 +331,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'Our brand new card', :taskboard_id => @taskboard.id, :column_id => @column.id, :row_id => @row.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 1
       new_card.column.should eql @column
@@ -377,7 +347,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'http://some.url.com/jira/browse/IST-4703', :taskboard_id => @taskboard.id, :column_id => @column.id, :row_id => @row.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 1
       new_card.column.should eql @column
@@ -396,7 +366,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'http://some.url.com/jira/browse/IST-4703', :taskboard_id => @taskboard.id, :column_id => @column.id, :row_id => @row.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 1
     end
@@ -410,7 +380,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'http://some.url.com/jira/browse/IST-4703', :taskboard_id => @taskboard.id, :column_id => @column.id, :row_id => @row.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 3
       new_cards.each { |card|
@@ -427,7 +397,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'http://example.com', :taskboard_id => @taskboard.id, :column_id => @column.id, :row_id => @row.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 1
       new_card.row.should eql @row
@@ -446,7 +416,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'Our brand new card', :taskboard_id => @taskboard.id, :column_id => '', :row_id => @row.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 1
       new_card.row.should eql @row
@@ -460,7 +430,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'Our brand new card', :taskboard_id => @taskboard.id, :column_id => @column.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'success'
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'success'
 
       @taskboard.cards.size.should eql @taskboard_old_cards_size + 1
       new_card.column.should eql @column
@@ -475,7 +445,7 @@ describe TaskboardController do
 
       post_as_editor 'add_card', :name => 'http://some.url.com/jira/browse/IST-4703', :taskboard_id => @taskboard.id, :column_id => column.id
       response.should be_success
-      response.body.decode_json["status"].should eql 'error'    
+      ActiveSupport::JSON.decode(response.body)['status'].should == 'error'
     end
   end
 end
