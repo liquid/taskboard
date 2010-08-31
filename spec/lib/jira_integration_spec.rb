@@ -32,12 +32,12 @@ describe JiraIntegration, "while downloading file" do
     Net::HTTP.should_receive(:new).with(uri.host, uri.port).and_return(http)
     request = Object.new
     request.should_receive(:body).and_return('Some data')
-    http.should_receive(:get).with(uri.path + '?os_password=pass&os_username=user').and_return(request)
+    http.should_receive(:get).with(uri.path + '?os_username=user&os_password=pass').and_return(request)
 
     data = JiraIntegration.get('http://jira.example.com/site')
 
     data.should eql('Some data')
-    uri.query.should eql('os_password=pass&os_username=user')
+    uri.query.should eql('os_username=user&os_password=pass')
   end
 
   it "should return valid content for given url with query" do
@@ -49,12 +49,12 @@ describe JiraIntegration, "while downloading file" do
     Net::HTTP.should_receive(:new).with(uri.host, uri.port).and_return(http)
     request = Object.new
     request.should_receive(:body).and_return('Some data')
-    http.should_receive(:get).with(uri.path + '?query_id=12&os_password=pass&os_username=user').and_return(request)
+    http.should_receive(:get).with(uri.path + '?query_id=12&os_username=user&os_password=pass').and_return(request)
 
     data = JiraIntegration.get('http://jira.example.com/site?query_id=12')
 
     data.should eql('Some data')
-    uri.query.should eql('query_id=12&os_password=pass&os_username=user')
+    uri.query.should eql('query_id=12&os_username=user&os_password=pass')
   end
 end
 
