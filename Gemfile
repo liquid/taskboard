@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.0.rc2'
+gem 'rails', '3.0.0'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -29,8 +29,7 @@ gem 'mysql'
 gem 'juggernaut'
 
 group :development, :test do
-  gem "rspec-rails", ">= 2.0.0.beta.19"
+  gem "rspec-rails", ">= 2.0.0.beta.20"
   gem 'ZenTest', :require => false
   gem 'rcov', :require => false
-  gem 'test-unit', '1.2.3'
 end
