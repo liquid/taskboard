@@ -29,7 +29,7 @@ describe ApplicationHelper do
 
   it "should build proper javascript data structure from empty burndown hash" do
     burndown = burndown(Card.new)
-    burndown.should include_text("[]")    
+    burndown.should include("[]")
   end
 
   it "should build proper javascript data structure from not-empty burndown hash" do

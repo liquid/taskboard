@@ -180,8 +180,8 @@ describe Card, "while serializing to json" do
   end
 
   it "should include cards with urls" do
-    @card.to_json.should include_text('"issue_no":"' + @card.issue_no+ '"')
-    @card.to_json.should include_text('"url":"' + @card.url + '"')
+    @card.to_json.should include('"issue_no":"' + @card.issue_no+ '"')
+    @card.to_json.should include('"url":"' + @card.url + '"')
   end
 
 end
